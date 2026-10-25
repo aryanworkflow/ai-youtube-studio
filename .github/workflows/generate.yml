@@ -1,0 +1,38 @@
+
+name: AI YouTube Studio
+
+on:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: "Video format"
+        required: true
+        type: choice
+        options:
+          - shorts
+          - explainer
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check video tools
+        run: |
+          python --version
+          ffmpeg -version
+
+      - name: Show selected format
+        run: |
+          echo "Selected format: ${{ inputs.format }}"
+          echo "Cloud workflow is running successfully."
