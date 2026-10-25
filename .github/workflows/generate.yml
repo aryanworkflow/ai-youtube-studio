@@ -18,6 +18,8 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,18 +29,22 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install video tools
+      - name: Install video tools and voice
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg librsvg2-bin
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install --upgrade pip
+          python -m pip install Pillow
 
-      - name: Generate video
-        run: |
-          VIDEO_FORMAT="${{ inputs.format }}" python generate_video.py
+      - name: Generate narrated video
+        env:
+          VIDEO_FORMAT: ${{ inputs.format }}
+        run: python generate_video.py
 
-      - name: Upload video for review
+      - name: Save video for review
         uses: actions/upload-artifact@v4
         with:
           name: youtube-video-preview
           path: output/
+          if-no-files-found: error
           retention-days: 7
